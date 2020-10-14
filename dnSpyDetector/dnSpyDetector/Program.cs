@@ -53,7 +53,6 @@ namespace dnSpyDetector
 
     public static void CheckForHookedCheckRemoteDebuggerPresent()
         {
-            GetProcessIdCheckRemoteDebuggerPresent = GetProcAddress(kernel32, "CheckRemoteDebuggerPresent");
             byte [] data = new byte[5];
             System.Runtime.InteropServices.Marshal.Copy(GetProcessIdCheckRemoteDebuggerPresent, data, 0, 5);
             Console.WriteLine("[CRDP]Data[0]: 0x" + data[0].ToString("X"));
