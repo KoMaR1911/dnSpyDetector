@@ -1,7 +1,7 @@
 # dnSpyDetector by XenoCodeRCE edited by KoMaR1911 (my implementation)
 A quick way to check for the presence of dnSpy hooks / other inline hooks in memory
 
-Feauters: 
+Features: 
 - Check for inline hooks on IsDebuggerPresent / RemoteDebuggerPresent
 - Check for parrent process (explorer.exe / cmd.exe)
 
