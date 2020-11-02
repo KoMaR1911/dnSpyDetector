@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 
 namespace dnSpyDetector
 {
-    class Program
+   static class Program
     {
-
         [System.Runtime.InteropServices.DllImport("kernel32.dll")]
         public static extern IntPtr LoadLibrary(string dllToLoad);
 
@@ -14,19 +14,57 @@ namespace dnSpyDetector
         public static IntPtr kernel32 = LoadLibrary("kernel32.dll");
         public static IntPtr GetProcessIdIsDebuggerPresent = GetProcAddress(kernel32, "IsDebuggerPresent");
         public static IntPtr GetProcessIdCheckRemoteDebuggerPresent = GetProcAddress(kernel32, "CheckRemoteDebuggerPresent");
-         static void Main(string[] args) {
+        public static string ParrentProcess = Process.GetProcessById(Process.GetCurrentProcess().Id).Parent().ProcessName;
 
-            
+
+        //https://stackoverflow.com/questions/394816/how-to-get-parent-process-in-net-in-managed-way
+        public static string FindIndexedProcessName(int pid)
+        {
+            var processName = Process.GetProcessById(pid).ProcessName;
+            var processesByName = Process.GetProcessesByName(processName);
+            string processIndexdName = null;
+
+            for (var index = 0; index < processesByName.Length; index++)
+            {
+                processIndexdName = index == 0 ? processName : processName + "#" + index;
+                var processId = new PerformanceCounter("Process", "ID Process", processIndexdName);
+                if ((int)processId.NextValue() == pid)
+                {
+                    return processIndexdName;
+                }
+            }
+
+            return processIndexdName;
+        }
+        public static Process FindPidFromIndexedProcessName(string indexedProcessName)
+        {
+            var parentId = new PerformanceCounter("Process", "Creating Process ID", indexedProcessName);
+            return Process.GetProcessById((int)parentId.NextValue());
+        }
+
+        public static Process Parent(this Process process)
+        {
+            return FindPidFromIndexedProcessName(FindIndexedProcessName(process.Id));
+        }
+
+        static void Main(string[] args) {
             while (true)
             {
                 Console.WriteLine("Checking the presence of dnSpy hooks ...");
                 CheckForHookedIsDebuggerPresent();
                 CheckForHookedCheckRemoteDebuggerPresent();
+                CheckForParrentProcess();
+                Console.WriteLine("Parent Process: " + ParrentProcess);
                 Thread.Sleep(2000);
                 Console.Clear();
             }
         }
-
+        public static void CheckForParrentProcess()
+        {
+            if ((!ParrentProcess.Equals("explorer")) & (!ParrentProcess.Equals("cmd"))){
+                Console.WriteLine("Wrong parrent process! maybe your process is runned by debugger!");
+            }
+        }
         public static void CheckForHookedIsDebuggerPresent()
         {
             byte[] data = new byte[5];
@@ -51,7 +89,7 @@ namespace dnSpyDetector
             }
         }
 
-    public static void CheckForHookedCheckRemoteDebuggerPresent()
+        public static void CheckForHookedCheckRemoteDebuggerPresent()
         {
             byte [] data = new byte[5];
             System.Runtime.InteropServices.Marshal.Copy(GetProcessIdCheckRemoteDebuggerPresent, data, 0, 5);
