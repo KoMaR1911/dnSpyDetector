@@ -80,7 +80,6 @@ namespace dnSpyDetector
             Process proc = Process.GetProcessById(ParrentProcessId);
             string filename = proc.MainModule.FileName;
             Console.WriteLine("[Digital Signature]: {0}", WinTrust.VerifyEmbeddedSignature(filename));
-            Console.WriteLine("Signature is OK: {0}", (filename));
             Console.WriteLine("Parent process path: " + filename);
         }
         public static void CheckForParrentProcess()
