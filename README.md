@@ -2,8 +2,9 @@
 A quick way to check for the presence of dnSpy hooks / other inline hooks in memory
 
 Features: 
-- Check for inline hooks on IsDebuggerPresent / RemoteDebuggerPresent
+- Check for inline hooks on IsDebuggerPresent / RemoteDebuggerPresent / WinVerifyTrust
 - Check for parrent process (explorer.exe / cmd.exe)
+- Check digital signature (Parent process)
 
 ![](https://i.imgur.com/a72g4Mv.png)
 
